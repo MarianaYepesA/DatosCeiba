@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 # coding: utf-8
 
-# In[12]:
+# In[3]:
 
 
 import pandas as pd
@@ -13,7 +13,7 @@ import plotly.express as px
 # ### Siendo la 1ra timestamp y las otras 27 a analizar
 # ### posteriormente se van a crear dos columnas al inicio con el fin de filtrar dias y horas más facilmente
 
-# In[13]:
+# In[5]:
 
 
 data = pd.read_csv(r'c:\Users\personal\Downloads\cs_db.csv',low_memory=False,delimiter=";")
@@ -78,7 +78,7 @@ for column in data.columns[17:24]:
     px.scatter(temp, x="DateHours", y=column).show()
 
 
-# In[10]:
+# In[11]:
 
 
 for column in data.columns[24:30]:
@@ -86,6 +86,76 @@ for column in data.columns[24:30]:
     temp = temp[temp[column]!= 0]
     temp = temp.sort_values("DateHours")
     px.scatter(temp, x="DateHours", y=column).show()
+
+
+# In[45]:
+
+
+temp = data.dropna(subset=["PV voltage"], inplace=False)
+temp = temp[temp["PV voltage"]!= 0]
+temp = temp.sort_values("Date")
+voltaje=temp["PV voltage"]
+potencia=temp["PV power"]
+temperatura=temp["Battery temperature"]
+watts=temp["Battery watts"]
+inputvolt1=temp["Input voltage phase 1"]
+outputvoltphase1=temp["Output voltage phase 1"]
+inputcurrent1=temp["Input current phase 1"]
+print(temp["Date"])
+
+
+# In[47]:
+
+
+import plotly.express as px
+
+# List arguments in wide form
+datos3 = [inputvolt1,outputvoltphase1,inputcurrent1]
+series2 = potencia
+fig = px.line(x=temp["Date"], y=datos3)
+newnames = {'wide_variable_0':'input voltaje fase 1', 'wide_variable_1': 'output voltaje fase 1', 'wide_variable_2': 'input current fase 1'}
+fig.for_each_trace(lambda t: t.update(name = newnames[t.name],
+                                      legendgroup = newnames[t.name],
+                                      hovertemplate = t.hovertemplate.replace(t.name, newnames[t.name])
+                                     )
+                  )
+fig.show()
+
+
+# In[34]:
+
+
+import plotly.express as px
+
+# List arguments in wide form
+datos = [voltaje,potencia]
+series2 = potencia
+fig = px.line(x=temp["Date"], y=datos)
+newnames = {'wide_variable_0':'voltaje', 'wide_variable_1': 'potencia'}
+fig.for_each_trace(lambda t: t.update(name = newnames[t.name],
+                                      legendgroup = newnames[t.name],
+                                      hovertemplate = t.hovertemplate.replace(t.name, newnames[t.name])
+                                     )
+                  )
+fig.show()
+
+
+# In[41]:
+
+
+import plotly.express as px
+
+# List arguments in wide form
+datos2 = [watts,temperatura]
+series2 = potencia
+fig = px.line(x=temp["Date"], y=datos2)
+newnames = {'wide_variable_0':'watts', 'wide_variable_1': 'temperatura'}
+fig.for_each_trace(lambda t: t.update(name = newnames[t.name],
+                                   legendgroup = newnames[t.name],
+                                      hovertemplate = t.hovertemplate.replace(t.name, newnames[t.name])
+                                    )
+                 )
+fig.show()
 
 
 # ## El siguiente código grafica todas las variables por día específico
@@ -252,10 +322,11 @@ data['AC Consumption L1'].plot(kind='density')
 data['AC Consumption L1'].describe()
 
 
-# In[ ]:
+# In[10]:
 
 
 
+ plt.scatter(data["DateHours"], data["Battery temperature"])
 
 
 # In[162]:
